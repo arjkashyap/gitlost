@@ -2,7 +2,7 @@
 The Git-Real Project
 
 
-## Technology Stack
+### Technology Stack
 - Runtime Env                         =           Node.Js
 - Programming Language                =           Typescript
 - Front end                           =           Next.js + React.js
