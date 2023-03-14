@@ -4,12 +4,19 @@ import { UserResolver } from "./resolvers/user";
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
+import { ProjectResolver } from "./resolvers/project";
+import { AppDataSource } from "./data-source";
 
 const main = async () => {
+  await AppDataSource.initialize().then(() =>
+    console.log("db connection established")
+  );
+
   const app = express();
 
   const schema = await buildSchema({
-    resolvers: [UserResolver],
+    resolvers: [UserResolver, ProjectResolver],
+    validate: false,
   });
 
   const apolloServer = new ApolloServer({
