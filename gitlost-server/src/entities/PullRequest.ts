@@ -25,7 +25,7 @@ export class PullRequest extends BaseEntity {
   @Column({ length: 400 })
   description: string;
 
-  @Field()
+  @Field(() => Project)
   @ManyToOne(() => Project)
   project: Project;
 

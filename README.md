@@ -9,3 +9,6 @@ The Git-Real Project
 - Backend Framework                   =           Express
 - Database                            =           Postgresql
 - ORM                                 =           TypeORM
+- Session Storage                     =           Reddis for storing expression session middleware
+#### Dependencies: 
+- TypeGraphQL: defining the schema using only classes and decorators

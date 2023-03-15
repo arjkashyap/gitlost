@@ -4,9 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { Project } from "./Project";
 import { PullRequest } from "./PullRequest";
 
 @ObjectType()
@@ -33,6 +35,10 @@ export class User extends BaseEntity {
   @Field(() => String)
   @CreateDateColumn()
   createdAt: Date;
+
+  @Field()
+  @ManyToOne(() => Project)
+  starredProjects: Project;
 
   @OneToMany(() => PullRequest, (pr) => pr.from)
   pullRequest: PullRequest[];

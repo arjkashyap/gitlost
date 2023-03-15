@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from "type-graphql";
 import {
+  BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
@@ -7,24 +8,26 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PullRequest } from "./PullRequest";
+import { User } from "./User";
 
 @ObjectType()
 @Entity()
-export class Project {
+export class Project extends BaseEntity {
   @Field(() => ID)
   @PrimaryGeneratedColumn()
-  id!: string;
+  id: string;
 
+  @Field()
   @Column()
   name!: string;
 
-  @Field()
-  @Column()
-  upvotes!: number;
+  @Field(() => User, { defaultValue: [] })
+  @OneToMany(() => User, (u) => u.starredProjects)
+  starredByUsers: User[];
 
   @Field()
-  @Column()
-  currentVersion!: number;
+  @Column({ default: 1.0 })
+  currentVersion: number;
 
   @Field()
   @Column()
@@ -35,9 +38,9 @@ export class Project {
   description: string;
 
   // where the site can be viewed (deployed)
-  @Field()
-  @Column()
-  previewUrl!: string;
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  previewUrl?: string;
 
   // where the file will be stored
   @Column()
@@ -49,17 +52,17 @@ export class Project {
 
   @Field(() => String)
   @CreateDateColumn()
-  createdAt!: Date;
+  createdAt: Date;
 
   @Field(() => String)
   @CreateDateColumn()
-  updatedAt!: Date;
+  updatedAt: Date;
 
   @Field(() => Boolean)
   @Column({ default: true })
-  read!: Boolean;
+  read: Boolean;
 
   @Field(() => Boolean)
   @Column({ default: true })
-  write!: Boolean;
+  write: Boolean;
 }
