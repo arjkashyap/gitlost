@@ -72,7 +72,7 @@ export class UserResolver {
     @Arg("input") input: UsernamePasswordInput,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    console.log("registerhit");
+    console.log("register hit");
     const hashedPassword = await argon2.hash(input.password);
     let queryResponse;
     try {
@@ -85,7 +85,8 @@ export class UserResolver {
     } catch (err) {
       console.log(err);
       // perform some more validations here
-      if (err.code === "23505") {
+      if (err.code === "23505" && err.detail?.includes("username")) {
+        console.log("type of error in username: " + typeof err);
         return {
           errors: [
             {
@@ -95,6 +96,17 @@ export class UserResolver {
           ],
         };
       }
+      // if (err.code === "23505" && err.details.includes("email")) {
+      //   console.log("type of error: " + typeof err);
+      //   return {
+      //     errors: [
+      //       {
+      //         field: "email",
+      //         message: "email already registered",
+      //       },
+      //     ],
+      //   };
+      // }
 
       // password too short
       // email already exists

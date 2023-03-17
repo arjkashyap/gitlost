@@ -10,6 +10,7 @@ import { createClient } from "redis";
 import session from "express-session";
 import RedisStore from "connect-redis";
 import { MyContext } from "./types";
+import cors from "cors";
 
 const main = async () => {
   // ORM
@@ -19,6 +20,9 @@ const main = async () => {
 
   // Express app
   const app = express();
+
+  // cors middleware
+  app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
   // Redis
   // Initialize client.
@@ -67,7 +71,7 @@ const main = async () => {
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   // Server
   app.listen(4000, () => {

@@ -1,14 +1,14 @@
 # gitlost
+
 The Git-Real Project
 
+### Deps
 
-### Technology Stack
-- Runtime Env                         =           Node.Js
-- Programming Language                =           Typescript
-- Front end                           =           Next.js + React.js
-- Backend Framework                   =           Express
-- Database                            =           Postgresql
-- ORM                                 =           TypeORM
-- Session Storage                     =           Reddis for storing expression session middleware
-#### Dependencies: 
-- TypeGraphQL: defining the schema using only classes and decorators
+- Runtime Env = Node.Js
+- Programming Language = Typescript
+- Front end = Next.js + React.js
+- Backend Framework = Express
+- Database = Postgresql
+- ORM = TypeORM
+- Session Storage = Reddis for storing expression session middleware
+- Urql = For making client side request to graphql

@@ -20,17 +20,17 @@ export class User extends BaseEntity {
 
   @Field()
   @Column({ unique: true })
-  username: string;
+  username!: string;
 
   @Field({ nullable: true })
   @Column({ nullable: true })
   bio: string;
 
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Field(() => String)
   @CreateDateColumn()
@@ -46,4 +46,8 @@ export class User extends BaseEntity {
   @Field(() => String)
   @CreateDateColumn()
   updatedAt: Date;
+
+  @Field(() => Boolean)
+  @Column({ default: false })
+  verified: Boolean;
 }
