@@ -11,6 +11,7 @@ import session from "express-session";
 import RedisStore from "connect-redis";
 import { MyContext } from "./types";
 import cors from "cors";
+import { COOKIE_NAME } from "./constants";
 
 const main = async () => {
   // ORM
@@ -40,7 +41,7 @@ const main = async () => {
   // Initialize sesssion storage.
   app.use(
     session({
-      name: "qid",
+      name: COOKIE_NAME,
       store: redisStore,
       resave: false, // required: force lightweight session keep alive (touch)
       saveUninitialized: false, // recommended: only save session when data exists

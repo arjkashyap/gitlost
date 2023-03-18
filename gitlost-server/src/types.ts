@@ -1,13 +1,10 @@
 import { Request, Response } from "express";
-import "express-session";
+import { Session, SessionData } from "express-session";
 
-declare module "express-session" {
-  interface SessionData {
-    userId: string;
-  }
-}
 export type MyContext = {
-  req: Request;
-  //   redis: Redis;
+  req: Request & {
+    session: Session & Partial<SessionData> & { userId?: string };
+  };
+  // redis: Redis;
   res: Response;
 };

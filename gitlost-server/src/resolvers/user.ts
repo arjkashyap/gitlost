@@ -8,9 +8,10 @@ import {
   Query,
 } from "type-graphql";
 import { User } from "../entities/User";
-import { UsernamePasswordInput } from "./UsernamePasswordInput";
+import { LoginInput, RegisterInput } from "./LoginInput";
 import argon2 from "argon2";
 import { MyContext } from "src/types";
+import { COOKIE_NAME } from "../constants";
 
 @ObjectType()
 class FieldError {
@@ -32,8 +33,8 @@ class UserResponse {
 export class UserResolver {
   @Query(() => User, { nullable: true })
   async me(@Ctx() { req }: MyContext) {
+    console.log("Me query called: ");
     if (!req.session.userId) return null;
-
     const user = await User.findOne({ where: { id: req.session.userId } });
     return user;
   }
@@ -45,9 +46,10 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg("options") options: UsernamePasswordInput,
+    @Arg("options") options: LoginInput,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
+    console.log("Login called.");
     const user = await User.findOne({ where: { username: options.username } });
     if (!user) {
       return {
@@ -69,10 +71,10 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async register(
-    @Arg("input") input: UsernamePasswordInput,
+    @Arg("input") input: RegisterInput,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    console.log("register hit");
+    console.log("register called");
     const hashedPassword = await argon2.hash(input.password);
     let queryResponse;
     try {
@@ -86,7 +88,6 @@ export class UserResolver {
       console.log(err);
       // perform some more validations here
       if (err.code === "23505" && err.detail?.includes("username")) {
-        console.log("type of error in username: " + typeof err);
         return {
           errors: [
             {
@@ -110,10 +111,24 @@ export class UserResolver {
 
       // password too short
       // email already exists
-
-      if (queryResponse) req.session.userId = queryResponse?.id;
     }
-    console.log(`${input.username} user signed up.`);
+    if (queryResponse) req.session.userId = queryResponse?.id;
     return { user: queryResponse };
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        res.clearCookie(COOKIE_NAME);
+        if (err) {
+          console.log(err);
+          resolve(false);
+          return;
+        }
+
+        resolve(true);
+      })
+    );
   }
 }
