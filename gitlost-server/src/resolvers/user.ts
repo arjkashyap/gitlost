@@ -12,6 +12,8 @@ import { LoginInput, RegisterInput } from "./LoginInput";
 import argon2 from "argon2";
 import { MyContext } from "src/types";
 import { COOKIE_NAME } from "../constants";
+import { sendEmail } from "../utils/sendEmail";
+import { validateRegister } from "../utils/inputValidators";
 
 @ObjectType()
 class FieldError {
@@ -44,16 +46,52 @@ export class UserResolver {
     return await (await User.find()).slice(0, limit);
   }
 
+  @Mutation(() => Boolean)
+  async forgotPassword(
+    @Arg("email") email: string
+    // @Ctx() { redis }: MyContext
+  ) {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      // the email is not in the db
+      return true;
+    }
+
+    // const token = v4();
+    const token = "dummy-token";
+    // await redis.set(
+    //   FORGET_PASSWORD_PREFIX + token,
+    //   user.id,
+    //   "ex",
+    //   1000 * 60 * 60 * 24 * 3
+    // ); // 3 days
+
+    await sendEmail(
+      email,
+      "Password reset",
+      `<a href="http://localhost:3000/change-password/${token}">reset password</a>`
+    );
+
+    return true;
+  }
+
   @Mutation(() => UserResponse)
   async login(
     @Arg("options") options: LoginInput,
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     console.log("Login called.");
-    const user = await User.findOne({ where: { username: options.username } });
+    let user = null;
+    if (options.usernameOrEmail?.includes("@")) {
+      user = await User.findOne({ where: { email: options.usernameOrEmail } });
+    } else
+      user = await User.findOne({
+        where: { username: options.usernameOrEmail },
+      });
+
     if (!user) {
       return {
-        errors: [{ field: "username", message: "username does not exist" }],
+        errors: [{ field: "usernameOrEmail", message: "user does not exist" }],
       };
     }
     const valid = await argon2.verify(user.password, options.password);
@@ -75,6 +113,11 @@ export class UserResolver {
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     console.log("register called");
+    const errors = validateRegister(input);
+    if (errors) {
+      return { errors };
+    }
+
     const hashedPassword = await argon2.hash(input.password);
     let queryResponse;
     try {
@@ -85,7 +128,6 @@ export class UserResolver {
 
       queryResponse = await newUser.save();
     } catch (err) {
-      console.log(err);
       // perform some more validations here
       if (err.code === "23505" && err.detail?.includes("username")) {
         return {
@@ -97,20 +139,17 @@ export class UserResolver {
           ],
         };
       }
-      // if (err.code === "23505" && err.details.includes("email")) {
-      //   console.log("type of error: " + typeof err);
-      //   return {
-      //     errors: [
-      //       {
-      //         field: "email",
-      //         message: "email already registered",
-      //       },
-      //     ],
-      //   };
-      // }
 
-      // password too short
-      // email already exists
+      if (err.code === "23505" && err.detail?.includes("email")) {
+        return {
+          errors: [
+            {
+              field: "email",
+              message: "email already registered",
+            },
+          ],
+        };
+      }
     }
     if (queryResponse) req.session.userId = queryResponse?.id;
     return { user: queryResponse };

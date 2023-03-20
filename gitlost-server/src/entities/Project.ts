@@ -21,6 +21,10 @@ export class Project extends BaseEntity {
   @Column()
   name!: string;
 
+  @Field()
+  @Column({ default: 0 })
+  likes: number;
+
   @Field(() => User, { defaultValue: [] })
   @OneToMany(() => User, (u) => u.starredProjects)
   starredByUsers: User[];

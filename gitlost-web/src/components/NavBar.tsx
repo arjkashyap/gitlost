@@ -1,12 +1,20 @@
-import { Box, Button, Flex, Link } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Link,
+  LinkBox,
+  LinkOverlay,
+} from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
+import { isRunningOnServer } from "../utils/isRunningOnServer";
 
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
-  const [{ data, fetching }] = useMeQuery();
+  const [{ data, fetching }] = useMeQuery(); // do not run this query if doing ssr
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   let body = null;
   if (fetching) {
@@ -15,17 +23,25 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     // user not logged in
     body = (
       <>
-        <NextLink href="/login">
+        <LinkBox>
+          <LinkOverlay as={NextLink} href="/login" m={2}>
+            login
+          </LinkOverlay>
+          <LinkOverlay as={NextLink} href="/register">
+            register
+          </LinkOverlay>
+        </LinkBox>
+        {/* <Link as={NextLink} href="/login">
           <Link mr={2}>login</Link>
-        </NextLink>
-        <NextLink href="/register">
+        </Link>
+        <Link as={NextLink} href="/register">
           <Link>register</Link>
-        </NextLink>
+        </Link> */}
       </>
     );
   } else {
     body = (
-      <Flex>
+      <Flex align={"center"}>
         <Box m={2}>{data.me.username}</Box>
         <Button
           onClick={() => {

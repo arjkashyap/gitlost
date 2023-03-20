@@ -12,8 +12,15 @@ import RedisStore from "connect-redis";
 import { MyContext } from "./types";
 import cors from "cors";
 import { COOKIE_NAME } from "./constants";
+import { sendEmail } from "./utils/sendEmail";
 
 const main = async () => {
+  // await sendEmail(
+  //   "arj.kashyap123@gmail.com",
+  //   "Testing nodemailer",
+  //   "this is a fake email"
+  // );
+
   // ORM
   await AppDataSource.initialize().then(() =>
     console.log("db connection established")

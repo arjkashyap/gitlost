@@ -1,0 +1,7 @@
+fragment ProjectShortInfo on Project {
+  id
+  name
+  description
+  previewUrl
+  likes
+}
