@@ -2,19 +2,24 @@ import {
   Box,
   Button,
   Flex,
+  Heading,
   Link,
   LinkBox,
   LinkOverlay,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { isRunningOnServer } from "../utils/isRunningOnServer";
+import { useRouter } from "next/router";
 
 interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
-  const [{ data, fetching }] = useMeQuery(); // do not run this query if doing ssr
+  const [isServer, setIsServer] = useState(true);
+  useEffect(() => setIsServer(false), []);
+
+  const [{ data, fetching }] = useMeQuery({ pause: isServer }); // do not run this query if doing ssr
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   let body = null;
   if (fetching) {
@@ -22,22 +27,18 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   } else if (!data?.me) {
     // user not logged in
     body = (
-      <>
-        <LinkBox>
-          <LinkOverlay as={NextLink} href="/login" m={2}>
+      <Box display="flex" alignItems="center">
+        <LinkBox mr={2}>
+          <LinkOverlay as={NextLink} href="/login">
             login
           </LinkOverlay>
+        </LinkBox>
+        <LinkBox>
           <LinkOverlay as={NextLink} href="/register">
             register
           </LinkOverlay>
         </LinkBox>
-        {/* <Link as={NextLink} href="/login">
-          <Link mr={2}>login</Link>
-        </Link>
-        <Link as={NextLink} href="/register">
-          <Link>register</Link>
-        </Link> */}
-      </>
+      </Box>
     );
   } else {
     body = (
@@ -57,8 +58,15 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     // user is logged in
   }
   return (
-    <Flex bg="teal" p={4}>
-      <Box ml={"auto"}>{body}</Box>
+    <Flex zIndex={1} position="sticky" top={0} bg="teal" p={4}>
+      <Flex flex={1} m={"auto"} align="center" maxW={800}>
+        <LinkBox>
+          <LinkOverlay as={NextLink} href="/">
+            <Heading>GitLost</Heading>
+          </LinkOverlay>
+        </LinkBox>
+        <Box ml={"auto"}>{body}</Box>
+      </Flex>
     </Flex>
   );
 };

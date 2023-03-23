@@ -28,11 +28,12 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createProject: Project;
+  createProject: ProjectQueryResponse;
   forgotPassword: Scalars['Boolean'];
   login: UserResponse;
   logout: Scalars['Boolean'];
   register: UserResponse;
+  updateProject?: Maybe<ProjectQueryResponse>;
 };
 
 
@@ -55,15 +56,22 @@ export type MutationRegisterArgs = {
   input: RegisterInput;
 };
 
+
+export type MutationUpdateProjectArgs = {
+  id: Scalars['String'];
+  input: ProjectInput;
+};
+
 export type Project = {
   __typename?: 'Project';
+  content: Scalars['String'];
   createdAt: Scalars['String'];
+  creatorId: Scalars['String'];
   currentVersion: Scalars['Float'];
   description?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
+  id: Scalars['String'];
   likes: Scalars['Float'];
   name: Scalars['String'];
-  orignalPosterId: Scalars['String'];
   previewUrl?: Maybe<Scalars['String']>;
   pullRequests: PullRequest;
   read: Scalars['Boolean'];
@@ -73,9 +81,15 @@ export type Project = {
 };
 
 export type ProjectInput = {
+  content: Scalars['String'];
   description: Scalars['String'];
   name: Scalars['String'];
-  s3FileUrl: Scalars['String'];
+};
+
+export type ProjectQueryResponse = {
+  __typename?: 'ProjectQueryResponse';
+  errors?: Maybe<Array<FieldError>>;
+  project?: Maybe<Project>;
 };
 
 export type PullRequest = {
@@ -137,7 +151,16 @@ export type UserResponse = {
 
 export type BasicUserFragment = { __typename?: 'User', id: string, username: string, email: string };
 
-export type ProjectShortInfoFragment = { __typename?: 'Project', id: string, name: string, description?: string | null, previewUrl?: string | null, likes: number };
+export type ProjectShortInfoFragment = { __typename?: 'Project', id: string, name: string, description?: string | null, previewUrl?: string | null };
+
+export type CreateProjectMutationVariables = Exact<{
+  name: Scalars['String'];
+  description: Scalars['String'];
+  content: Scalars['String'];
+}>;
+
+
+export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename?: 'ProjectQueryResponse', project?: { __typename?: 'Project', id: string, name: string, description?: string | null, content: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null } };
 
 export type LoginMutationVariables = Exact<{
   usernameOrEmail: Scalars['String'];
@@ -169,7 +192,7 @@ export type RegisterMutation = { __typename?: 'Mutation', register: { __typename
 export type ProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ProjectsQuery = { __typename?: 'Query', projects: Array<{ __typename?: 'Project', id: string, name: string, description?: string | null, previewUrl?: string | null, likes: number }> };
+export type ProjectsQuery = { __typename?: 'Query', projects: Array<{ __typename?: 'Project', id: string, name: string, description?: string | null, previewUrl?: string | null }> };
 
 export const BasicUserFragmentDoc = gql`
     fragment BasicUser on User {
@@ -184,9 +207,30 @@ export const ProjectShortInfoFragmentDoc = gql`
   name
   description
   previewUrl
-  likes
 }
     `;
+export const CreateProjectDocument = gql`
+    mutation CreateProject($name: String!, $description: String!, $content: String!) {
+  createProject(
+    input: {name: $name, description: $description, content: $content}
+  ) {
+    project {
+      id
+      name
+      description
+      content
+    }
+    errors {
+      field
+      message
+    }
+  }
+}
+    `;
+
+export function useCreateProjectMutation() {
+  return Urql.useMutation<CreateProjectMutation, CreateProjectMutationVariables>(CreateProjectDocument);
+};
 export const LoginDocument = gql`
     mutation Login($usernameOrEmail: String!, $password: String!) {
   login(options: {usernameOrEmail: $usernameOrEmail, password: $password}) {

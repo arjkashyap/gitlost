@@ -1,0 +1,20 @@
+mutation CreateProject(
+  $name: String!
+  $description: String!
+  $content: String!
+) {
+  createProject(
+    input: { name: $name, description: $description, content: $content }
+  ) {
+    project {
+      id
+      name
+      description
+      content
+    }
+    errors {
+      field
+      message
+    }
+  }
+}

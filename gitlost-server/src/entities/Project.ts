@@ -1,9 +1,10 @@
-import { ObjectType, Field, ID } from "type-graphql";
+import { ObjectType, Field } from "type-graphql";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -13,12 +14,12 @@ import { User } from "./User";
 @ObjectType()
 @Entity()
 export class Project extends BaseEntity {
-  @Field(() => ID)
-  @PrimaryGeneratedColumn()
+  @Field()
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Field()
-  @Column()
+  @Column({ nullable: false })
   name!: string;
 
   @Field()
@@ -30,12 +31,15 @@ export class Project extends BaseEntity {
   starredByUsers: User[];
 
   @Field()
-  @Column({ default: 1.0 })
-  currentVersion: number;
+  @Column({ default: 1.0, nullable: false })
+  currentVersion!: number;
 
   @Field()
-  @Column()
-  orignalPosterId!: string;
+  @Column({ nullable: false })
+  creatorId!: string;
+
+  @ManyToOne(() => User, (user) => user.createdProjects)
+  creator: User;
 
   @Field({ nullable: true })
   @Column()
@@ -47,8 +51,9 @@ export class Project extends BaseEntity {
   previewUrl?: string;
 
   // where the file will be stored
+  @Field()
   @Column()
-  s3FileUrl!: string;
+  content!: string;
 
   @Field(() => PullRequest)
   @OneToMany(() => PullRequest, (pr) => pr.project)

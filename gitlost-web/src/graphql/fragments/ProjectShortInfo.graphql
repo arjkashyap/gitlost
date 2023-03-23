@@ -3,5 +3,4 @@ fragment ProjectShortInfo on Project {
   name
   description
   previewUrl
-  likes
 }

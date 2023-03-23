@@ -37,6 +37,9 @@ export class User extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 
+  @OneToMany(() => Project, (p) => p.creator)
+  createdProjects: Project[];
+
   @Field()
   @ManyToOne(() => Project)
   starredProjects: Project;

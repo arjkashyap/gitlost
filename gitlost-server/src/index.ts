@@ -12,7 +12,7 @@ import RedisStore from "connect-redis";
 import { MyContext } from "./types";
 import cors from "cors";
 import { COOKIE_NAME } from "./constants";
-import { sendEmail } from "./utils/sendEmail";
+// import { sendEmail } from "./utils/sendEmail";
 
 const main = async () => {
   // await sendEmail(

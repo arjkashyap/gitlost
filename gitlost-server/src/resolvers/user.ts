@@ -14,14 +14,7 @@ import { MyContext } from "src/types";
 import { COOKIE_NAME } from "../constants";
 import { sendEmail } from "../utils/sendEmail";
 import { validateRegister } from "../utils/inputValidators";
-
-@ObjectType()
-class FieldError {
-  @Field()
-  field: string;
-  @Field()
-  message: string;
-}
+import { FieldError } from "./FieldError";
 
 @ObjectType()
 class UserResponse {
@@ -36,6 +29,7 @@ export class UserResolver {
   @Query(() => User, { nullable: true })
   async me(@Ctx() { req }: MyContext) {
     console.log("Me query called: ");
+    console.log(req.session);
     if (!req.session.userId) return null;
     const user = await User.findOne({ where: { id: req.session.userId } });
     return user;
@@ -157,6 +151,7 @@ export class UserResolver {
 
   @Mutation(() => Boolean)
   logout(@Ctx() { req, res }: MyContext) {
+    console.log("logout called");
     return new Promise((resolve) =>
       req.session.destroy((err) => {
         res.clearCookie(COOKIE_NAME);
