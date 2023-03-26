@@ -1,21 +1,22 @@
 import { Box, Button } from "@chakra-ui/react";
-import { Form, Formik, FormikHelpers } from "formik";
+import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
-import router from "next/router";
+import { useRouter } from "next/router";
 import React from "react";
 import { InputField } from "../components/InputField";
-import { Wrapper } from "../components/Wrapper";
+import { Layout } from "../components/Layout";
 import { useCreateProjectMutation } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
-import { gqlToFormikMap } from "../utils/gqlToFormiMap";
-import login from "./login";
+import { userIsAuth } from "../utils/userIsAuth";
 
 interface PushProjectProps {}
 
 const PushProject: React.FC<PushProjectProps> = ({}) => {
+  userIsAuth();
+  const router = useRouter();
   const [, createProject] = useCreateProjectMutation();
   return (
-    <Wrapper variant="small">
+    <Layout variant="small">
       <Formik
         initialValues={{ name: "", description: "", content: "" }}
         onSubmit={async (values, { setErrors }) => {
@@ -64,7 +65,7 @@ const PushProject: React.FC<PushProjectProps> = ({}) => {
           </Form>
         )}
       </Formik>
-    </Wrapper>
+    </Layout>
   );
 };
 

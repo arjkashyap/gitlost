@@ -24,7 +24,13 @@ const Login: React.FC<loginProps> = ({}) => {
             setErrors(gqlToFormikMap(response.data.login.errors));
           } else if (response.data?.login.user) {
             // user logged in
-            router.push("/");
+            if (typeof router.query.next === "string") {
+              // redirect user to whaterver last page they were accesing
+              router.push(router.query.next);
+            } else {
+              // redirect user to homepage after login from /login
+              router.push("/");
+            }
           }
         }}
       >

@@ -175,11 +175,6 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, username: string } | null };
-
 export type RegisterMutationVariables = Exact<{
   email: Scalars['String'];
   username: Scalars['String'];
@@ -188,6 +183,11 @@ export type RegisterMutationVariables = Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null, user?: { __typename?: 'User', id: string, username: string, email: string } | null } };
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: string, username: string } | null };
 
 export type ProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -257,18 +257,6 @@ export const LogoutDocument = gql`
 export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
-export const MeDocument = gql`
-    query Me {
-  me {
-    id
-    username
-  }
-}
-    `;
-
-export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
-  return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
-};
 export const RegisterDocument = gql`
     mutation Register($email: String!, $username: String!, $password: String!) {
   register(input: {email: $email, username: $username, password: $password}) {
@@ -285,6 +273,18 @@ export const RegisterDocument = gql`
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const MeDocument = gql`
+    query Me {
+  me {
+    id
+    username
+  }
+}
+    `;
+
+export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
 };
 export const ProjectsDocument = gql`
     query Projects {

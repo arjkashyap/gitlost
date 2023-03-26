@@ -10,8 +10,6 @@ import {
 import React, { useEffect, useState } from "react";
 import NextLink from "next/link";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
-import { isRunningOnServer } from "../utils/isRunningOnServer";
-import { useRouter } from "next/router";
 
 interface NavBarProps {}
 
